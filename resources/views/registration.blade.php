@@ -717,6 +717,14 @@
       <button type="button" class="reg-btn-back" id="regBackBtn">Back</button>
       <button type="button" class="reg-btn-continue" id="regContinueBtn">Continue</button>
     </div>
+        <form id="regForm" method="POST" action="/register" hidden>
+      @csrf
+      <input type="hidden" name="name" id="regFormName">
+      <input type="hidden" name="username" id="regFormUsername">
+      <input type="hidden" name="email" id="regFormEmail">
+      <input type="hidden" name="password" id="regFormPassword">
+      <input type="hidden" name="password_confirmation" id="regFormPasswordConfirm">
+    </form>
   </main>
 
   
