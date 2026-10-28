@@ -1309,7 +1309,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const el = document.getElementById(id);
       if (el) el.textContent = text;
     };
-    set('sumAtmAccount', na(val('atmAccountNo')));
+        const acct = val('atmAccountNo');
+    set('sumAtmAccount', acct ? '******' + acct.slice(-4) : 'N/A');
     set('sumJai', na(val('jaiSelect')));
     set('sumAtmPin', val('atmPin') ? '••••' : 'N/A');
     set('sumFundTransfer', checked('enableFundTransfer') ? 'Yes' : 'No');
@@ -2080,6 +2081,85 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (continueBtn) {
+      // ---- Live "already registered" checks (calls Laravel: POST /register/check) ----
+  const AVAIL = {
+    1: [{ field: 'atm_account_no', input: 'atmAccountNo', msg: 'Account number already registered.' }],
+    2: [{ field: 'email',          input: 'email',        msg: 'Email already registered.' }],
+    4: [{ field: 'username',       input: 'iaccessId',    msg: 'iAccess ID is already taken.' }]
+  };
+
+  async function isTaken(field, value) {
+    try {
+      const tokenEl = document.querySelector('#regForm input[name="_token"]');
+      const res = await fetch('/register/check', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': tokenEl ? tokenEl.value : ''
+        },
+        body: JSON.stringify({ field: field, value: value })
+      });
+      if (!res.ok) return false;           // never block the user if the check itself fails
+      const data = await res.json();
+      return !!data.taken;                 // server rule in store() is still the final guard
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Returns true when every unique field on this step is still available
+  async function checkStepAvailability(step) {
+    let clean = true;
+    const checks = AVAIL[step] || [];
+    for (let i = 0; i < checks.length; i++) {
+      const c = checks[i];
+      if (await isTaken(c.field, val(c.input))) {
+        setError(c.input, c.input + 'Error', c.msg);
+        clean = false;
+      }
+    }
+    return clean;
+  }
+
+  const LIVE_AVAIL = [
+    { input: 'atmAccountNo', field: 'atm_account_no',
+      ok: function (v) { return /^\d{10}$/.test(v); },
+      msg: 'Account number already registered.' },
+    { input: 'email', field: 'email',
+      ok: function (v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); },
+      msg: 'Email already registered.' },
+    { input: 'iaccessId', field: 'username',
+      ok: function (v) { return /^[A-Za-z0-9]{6,20}$/.test(v); },
+      msg: 'iAccess ID is already taken.' }
+  ];
+  const availCache = {};
+
+  LIVE_AVAIL.forEach(function (c) {
+    const el = document.getElementById(c.input);
+    if (!el) return;
+    let timer = null;
+
+    async function run() {
+      const v = val(c.input);
+      if (!v || !c.ok(v) || el.classList.contains('error')) return;
+
+      const key = c.field + '|' + v.toLowerCase();
+      if (!(key in availCache)) availCache[key] = await isTaken(c.field, v);
+
+      if (val(c.input) !== v) return;            // user kept typing: ignore this old answer
+      if (availCache[key]) setError(c.input, c.input + 'Error', c.msg);
+    }
+
+    el.addEventListener('input', function () {
+      clearTimeout(timer);
+      timer = setTimeout(run, 600);              
+    });
+    el.addEventListener('blur', function () {
+      clearTimeout(timer);
+      run();
+    });
+  });
     continueBtn.addEventListener('click', () => {
       
       if (currentStep === 5) {
@@ -2095,16 +2175,61 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
         completedSteps.add(5);
-        try { sessionStorage.setItem('pendingActivation', 'true'); } catch (e) {}
                 const regForm = document.getElementById('regForm');
-        if (regForm) {
-          document.getElementById('regFormName').value = val('firstName') + ' ' + val('lastName');
-          document.getElementById('regFormUsername').value = val('iaccessId');
-          document.getElementById('regFormEmail').value = val('email');
-          document.getElementById('regFormPassword').value = val('regPassword');
-          document.getElementById('regFormPasswordConfirm').value = val('regPasswordConfirm');
-          regForm.submit();
-        }
+if (regForm) {
+  // Step 1: Account
+  document.getElementById('regFormAtmAccountNo').value = val('atmAccountNo');
+  document.getElementById('regFormAtmPin').value = val('atmPin');
+  document.getElementById('regFormJai').value = val('jaiSelect');
+  document.getElementById('regFormEnableFundTransfer').value = document.getElementById('enableFundTransfer').checked ? '1' : '0';
+
+  // Step 2: Personal
+  document.getElementById('regFormFirstName').value = val('firstName');
+  document.getElementById('regFormMiddleName').value = val('middleName');
+  document.getElementById('regFormLastName').value = val('lastName');
+  document.getElementById('regFormMotherFirstName').value = val('motherFirstName');
+  document.getElementById('regFormMotherMiddleName').value = val('motherMiddleName');
+  document.getElementById('regFormMotherLastName').value = val('motherLastName');
+  document.getElementById('regFormGender').value = val('gender');
+  document.getElementById('regFormCivilStatus').value = val('civilStatus');
+  document.getElementById('regFormSpouseFirstName').value = val('spouseFirstName');
+  document.getElementById('regFormSpouseMiddleName').value = val('spouseMiddleName');
+  document.getElementById('regFormSpouseLastName').value = val('spouseLastName');
+  document.getElementById('regFormBirthday').value = val('birthday');
+  document.getElementById('regFormTin').value = val('tin');
+
+  // Step 2: Address
+  document.getElementById('regFormStreet').value = val('street');
+  document.getElementById('regFormBarangay').value = val('barangay');
+  document.getElementById('regFormCity').value = val('city');
+  document.getElementById('regFormProvince').value = val('province');
+  document.getElementById('regFormZip').value = val('zip');
+  document.getElementById('regFormCountry').value = val('country');
+
+  // Step 2: Contact
+  document.getElementById('regFormEmail').value = val('email');
+  document.getElementById('regFormAltEmail').value = val('altEmail');
+  document.getElementById('regFormMobileCountry').value = val('mobileCountry');
+  document.getElementById('regFormMobileNumber').value = val('mobileNumber');
+  document.getElementById('regFormHomeTel').value = val('homeTel');
+  document.getElementById('regFormOfficeTel').value = val('officeTel');
+
+  // Step 3: Security
+  document.getElementById('regFormSecQ1').value = val('secQ1');
+  document.getElementById('regFormSecA1').value = val('secA1');
+  document.getElementById('regFormSecQ2').value = val('secQ2');
+  document.getElementById('regFormSecA2').value = val('secA2');
+  document.getElementById('regFormSecQ3').value = val('secQ3');
+  document.getElementById('regFormSecA3').value = val('secA3');
+
+  // Step 4: Login
+  document.getElementById('regFormName').value = val('firstName') + ' ' + val('lastName');
+  document.getElementById('regFormUsername').value = val('iaccessId');
+  document.getElementById('regFormPassword').value = val('regPassword');
+  document.getElementById('regFormPasswordConfirm').value = val('regPasswordConfirm');
+
+  regForm.submit();
+}
         return;
       }
 
@@ -2130,24 +2255,92 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      completedSteps.add(currentStep);
-      showStep(currentStep + 1);
+            continueBtn.disabled = true;
+      checkStepAvailability(currentStep).then(function (clean) {
+        continueBtn.disabled = false;
+        if (!clean) {
+          const bad = panels[currentStep] && panels[currentStep].querySelector('.reg-input.error');
+          if (bad) {
+            window._fieldTouched[bad.id] = true;
+            try { bad.scrollIntoView({ behavior: 'smooth', block: 'center' }); bad.focus({ preventScroll: true }); } catch (e) {}
+          }
+          return;
+        }
+        completedSteps.add(currentStep);
+        showStep(currentStep + 1);
+      });
     });
   }
 
   const regSuccessClose = document.getElementById('regSuccessClose');
   if (regSuccessClose) {
     regSuccessClose.addEventListener('click', () => {
-      try { sessionStorage.setItem('pendingActivation', 'true'); } catch (e) {}
       if (window.smoothNavigate) window.smoothNavigate('/login');
       else window.location.href = '/login';
     });
   }
 
 
-  applySpouseCivilRules();
-  showStep(1);
-  openTermsModal();
+  // ---- Restore wizard after a server-side validation error ----
+  const SERVER_FIELD_MAP = {
+    atm_account_no:['atmAccountNo',1], atm_pin:['atmPin',1], jai:['jaiSelect',1],
+    first_name:['firstName',2], middle_name:['middleName',2], last_name:['lastName',2],
+    mother_first_name:['motherFirstName',2], mother_middle_name:['motherMiddleName',2],
+    mother_last_name:['motherLastName',2], gender:['gender',2], civil_status:['civilStatus',2],
+    spouse_first_name:['spouseFirstName',2], spouse_middle_name:['spouseMiddleName',2],
+    spouse_last_name:['spouseLastName',2], birthday:['birthday',2], tin:['tin',2],
+    street:['street',2], barangay:['barangay',2], city:['city',2], province:['province',2],
+    zip:['zip',2], country:['country',2], email:['email',2], alt_email:['altEmail',2],
+    mobile_country:['mobileCountry',2], mobile_number:['mobileNumber',2],
+    home_tel:['homeTel',2], office_tel:['officeTel',2],
+    sec_q1:['secQ1',3], sec_a1:['secA1',3], sec_q2:['secQ2',3], sec_a2:['secA2',3],
+    sec_q3:['secQ3',3], sec_a3:['secA3',3],
+    username:['iaccessId',4], password:['regPassword',4], name:[null,4]
+  };
+
+  const srv = window.REG_SERVER || {};
+  const srvErrors = srv.errors || {};
+
+  if (Object.keys(srvErrors).length) {
+    const old = srv.old || {};
+
+    // 1. refill the fields
+    Object.keys(SERVER_FIELD_MAP).forEach(function (key) {
+      const id = SERVER_FIELD_MAP[key][0];
+      const el = id && document.getElementById(id);
+      if (el && old[key] != null) el.value = old[key];
+    });
+    ['1', '2', '3'].forEach(function (n) {
+      const c = document.getElementById('secCA' + n);
+      if (c && old['sec_a' + n] != null) c.value = old['sec_a' + n];
+    });
+    const fund = document.getElementById('enableFundTransfer');
+    if (fund) fund.checked = old.enable_fund_transfer === '1';
+    const mc = document.getElementById('mobileCountry');
+    if (mc) mc.dispatchEvent(new Event('change'));
+    applySpouseCivilRules();
+
+    // 2. show the server messages inline and find the earliest step with an error
+    let firstStep = 5;
+    const unmapped = [];
+    Object.keys(srvErrors).forEach(function (key) {
+      const m = SERVER_FIELD_MAP[key];
+      if (!m) { unmapped.push(srvErrors[key][0]); return; }
+      if (m[0]) setError(m[0], m[0] + 'Error', srvErrors[key][0]);
+      firstStep = Math.min(firstStep, m[1]);
+    });
+
+    // 3. terms were already accepted; mark earlier steps done; go to the error step
+    termsAccepted = true;
+    for (let s = 1; s < firstStep; s++) completedSteps.add(s);
+    showStep(firstStep === 5 ? 4 : firstStep);
+
+    if (unmapped.length) alert(unmapped.join('\n'));
+  } else {
+    applySpouseCivilRules();
+    showStep(1);
+    openTermsModal();
+  }
 })();
 
 /* Homepage embedded section-view router */

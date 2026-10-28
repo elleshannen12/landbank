@@ -59,7 +59,26 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        RateLimiter::clear($this->throttleKey());
+                RateLimiter::clear($this->throttleKey());
+
+        // Credentials are correct, but the account must be approved first
+        $status = Auth::user()->status;
+
+        if ($status !== 'active') {
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'username' => $this->inactiveMessage($status),
+            ]);
+        }
+    }
+
+    private function inactiveMessage(?string $status): string
+    {
+        return match ($status) {
+            'pending' => 'Your account is pending activation. You will receive an email once it is approved and ready for login.',
+            default   => 'Your account is not active (' . ($status ?? 'unknown') . '). Please contact LANDBANK Customer Care at (02) 8405-7000.',
+        };
     }
 
     /**

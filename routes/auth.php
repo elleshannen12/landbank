@@ -17,6 +17,11 @@ Route::middleware('guest')->group(function () {
 
     Route::post('register', [RegisteredUserController::class, 'store']);
 
+    // Live availability check for the registration wizard (AJAX)
+    Route::post('register/check', [RegisteredUserController::class, 'check'])
+        ->middleware('throttle:30,1')
+        ->name('register.check');
+
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 

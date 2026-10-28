@@ -63,7 +63,7 @@
     <div class="login-card" role="form" aria-labelledby="loginHeading">
       
       <!-- Shown once after registration submit -->
-@if (session('status'))
+@if (session('registered'))
   <div class="login-pending-banner" id="pendingActivationBanner" role="status">
     Registration submitted! Your account is currently pending activation. You will receive an email once your account is approved and ready for login.
   </div>
@@ -307,7 +307,7 @@
           </div>
           <div class="care-item">
             <img src="{{ asset('images/email-envelope-icon.png') }}" alt="Email" class="care-icon">
-            <a href="homepage.html#sv-contact-panel" class="footer-care-email">customercare@landbank.com</a>
+              <a href="{{ url('/#sv-contact-panel') }}" class="footer-care-email">customercare@landbank.com</a>
           </div>
         </div>
       </div>

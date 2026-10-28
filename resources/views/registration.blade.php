@@ -52,7 +52,6 @@
   <!-- Registration wizard -->
   <main class="login-main reg-main">
     
-    
     <!-- Step progress indicator -->
     <div class="reg-stepper" id="regStepper" aria-label="Registration progress">
       <div class="reg-step active" data-step="1">
@@ -718,13 +717,59 @@
       <button type="button" class="reg-btn-continue" id="regContinueBtn">Continue</button>
     </div>
         <form id="regForm" method="POST" action="/register" hidden>
-      @csrf
-      <input type="hidden" name="name" id="regFormName">
-      <input type="hidden" name="username" id="regFormUsername">
-      <input type="hidden" name="email" id="regFormEmail">
-      <input type="hidden" name="password" id="regFormPassword">
-      <input type="hidden" name="password_confirmation" id="regFormPasswordConfirm">
-    </form>
+    @csrf
+
+    {{-- Step 1: Account --}}
+    <input type="hidden" name="atm_account_no" id="regFormAtmAccountNo">
+    <input type="hidden" name="atm_pin" id="regFormAtmPin">
+    <input type="hidden" name="jai" id="regFormJai">
+    <input type="hidden" name="enable_fund_transfer" id="regFormEnableFundTransfer">
+
+    {{-- Step 2: Personal --}}
+    <input type="hidden" name="first_name" id="regFormFirstName">
+    <input type="hidden" name="middle_name" id="regFormMiddleName">
+    <input type="hidden" name="last_name" id="regFormLastName">
+    <input type="hidden" name="mother_first_name" id="regFormMotherFirstName">
+    <input type="hidden" name="mother_middle_name" id="regFormMotherMiddleName">
+    <input type="hidden" name="mother_last_name" id="regFormMotherLastName">
+    <input type="hidden" name="gender" id="regFormGender">
+    <input type="hidden" name="civil_status" id="regFormCivilStatus">
+    <input type="hidden" name="spouse_first_name" id="regFormSpouseFirstName">
+    <input type="hidden" name="spouse_middle_name" id="regFormSpouseMiddleName">
+    <input type="hidden" name="spouse_last_name" id="regFormSpouseLastName">
+    <input type="hidden" name="birthday" id="regFormBirthday">
+    <input type="hidden" name="tin" id="regFormTin">
+
+    {{-- Step 2: Address --}}
+    <input type="hidden" name="street" id="regFormStreet">
+    <input type="hidden" name="barangay" id="regFormBarangay">
+    <input type="hidden" name="city" id="regFormCity">
+    <input type="hidden" name="province" id="regFormProvince">
+    <input type="hidden" name="zip" id="regFormZip">
+    <input type="hidden" name="country" id="regFormCountry">
+
+    {{-- Step 2: Contact --}}
+    <input type="hidden" name="email" id="regFormEmail">
+    <input type="hidden" name="alt_email" id="regFormAltEmail">
+    <input type="hidden" name="mobile_country" id="regFormMobileCountry">
+    <input type="hidden" name="mobile_number" id="regFormMobileNumber">
+    <input type="hidden" name="home_tel" id="regFormHomeTel">
+    <input type="hidden" name="office_tel" id="regFormOfficeTel">
+
+    {{-- Step 3: Security --}}
+    <input type="hidden" name="sec_q1" id="regFormSecQ1">
+    <input type="hidden" name="sec_a1" id="regFormSecA1">
+    <input type="hidden" name="sec_q2" id="regFormSecQ2">
+    <input type="hidden" name="sec_a2" id="regFormSecA2">
+    <input type="hidden" name="sec_q3" id="regFormSecQ3">
+    <input type="hidden" name="sec_a3" id="regFormSecA3">
+
+    {{-- Step 4: Login --}}
+    <input type="hidden" name="name" id="regFormName">
+    <input type="hidden" name="username" id="regFormUsername">
+    <input type="hidden" name="password" id="regFormPassword">
+    <input type="hidden" name="password_confirmation" id="regFormPasswordConfirm">
+</form>
   </main>
 
   
@@ -845,6 +890,12 @@
     </svg>
   </button>
 
+    <script>
+    window.REG_SERVER = {
+      errors: @json($errors->messages()),
+      old: @json(collect(old())->except(['password', 'password_confirmation'])),
+    };
+  </script>
   <script src="{{ asset('script.js') }}"></script>
 </body>
 </html>
