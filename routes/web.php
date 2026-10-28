@@ -10,7 +10,7 @@ Route::get('/', function () {
             : redirect()->route('user.dashboard');
     }
 
-    return view('Homepage');
+    return view('homepage');
 });
 
 Route::get('/dashboard', function () {
