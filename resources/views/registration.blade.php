@@ -772,7 +772,7 @@
         </section>
       </div>
       <div class="modal-footer tc-modal-footer">
-        <a href="terms-and-conditions.html?from=registration" class="tc-full-link" id="tcFullLink" target="_blank" rel="opener">
+        <a href="{{ route('terms', ['from' => 'registration']) }}" class="tc-full-link" id="tcFullLink" target="_blank" rel="opener">
           <img src="{{ asset('images/tc-link-icon.png') }}" alt="" width="16" height="16">
           Read the full Terms and Conditions
         </a>

@@ -212,7 +212,7 @@
       </div>
       <div class="modal-footer tc-modal-footer">
         
-        <a href="terms-and-conditions.html?from=login" class="tc-full-link" target="_blank" rel="opener">
+        <a href="{{ route('terms', ['from' => 'login']) }}" class="tc-full-link" target="_blank" rel="opener">
           <img src="{{ asset('images/tc-link-icon.png') }}" alt="" width="16" height="16">
           Read the full Terms and Conditions
         </a>
