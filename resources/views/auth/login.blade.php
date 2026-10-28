@@ -63,9 +63,11 @@
     <div class="login-card" role="form" aria-labelledby="loginHeading">
       
       <!-- Shown once after registration submit -->
-      <div class="login-pending-banner" id="pendingActivationBanner" role="status" hidden>
-        Registration submitted! Your account is currently pending activation. You will receive an email once your account is approved and ready for login.
-      </div>
+@if (session('status'))
+  <div class="login-pending-banner" id="pendingActivationBanner" role="status">
+    Registration submitted! Your account is currently pending activation. You will receive an email once your account is approved and ready for login.
+  </div>
+@endif
       
       <a href="{{ url('/') }}" class="login-back" id="backLink">
         <span class="back-arrow" aria-hidden="true">‹</span> Back
