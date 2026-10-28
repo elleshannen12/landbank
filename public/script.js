@@ -2063,8 +2063,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (backBtn) {
     backBtn.addEventListener('click', () => {
       if (currentStep === 1) {
-        if (window.smoothNavigate) window.smoothNavigate('homepage.html');
-        else window.location.href = 'homepage.html';
+        if (window.smoothNavigate) window.smoothNavigate('/');
+        else window.location.href = '/';
         return;
       }
       
