@@ -2135,8 +2135,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (regSuccessClose) {
     regSuccessClose.addEventListener('click', () => {
       try { sessionStorage.setItem('pendingActivation', 'true'); } catch (e) {}
-      if (window.smoothNavigate) window.smoothNavigate('login.html');
-      else window.location.href = 'login.html';
+      if (window.smoothNavigate) window.smoothNavigate('/login');
+      else window.location.href = '/login';
     });
   }
 
