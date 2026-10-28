@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loginBtn.addEventListener('click', () => {
       
       if (document.body.classList.contains('login-page')) return;
-      window.smoothNavigate('login.html');
+      window.smoothNavigate('/login');
     });
   }
 
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       if (signupBtnHome.tagName === 'A' && signupBtnHome.getAttribute('href')) return;
       e.preventDefault();
-      window.smoothNavigate('registration.html');
+      window.smoothNavigate('/register');
     });
   }
 
@@ -2723,9 +2723,9 @@ document.addEventListener('DOMContentLoaded', () => {
       link.addEventListener('click', function (e) {
         if (document.querySelector('.hero-container')) return;
         var href = link.getAttribute('href') || '';
-        if (href.indexOf('homepage.html') !== -1 && href.indexOf('#') === -1) {
+        if ((href === '/' || href.indexOf('homepage.html') !== -1) && href.indexOf('#') === -1) {
           e.preventDefault();
-          window.location.href = 'homepage.html#sv-contact-panel';
+          window.location.href = '/#sv-contact-panel';
         }
       });
     });
@@ -2764,12 +2764,12 @@ var actions = document.getElementById('svSubnavActions');
         from = null;
       }
       if (from === 'registration') {
-        backLink.href = 'registration.html';
+        backLink.href = '/register';
         const textEl = backLink.querySelector('.tc-back-text');
         if (textEl) textEl.textContent = 'Back to Registration';
         else backLink.textContent = 'Back to Registration';
       } else {
-        backLink.href = 'login.html';
+        backLink.href = '/login';
         const textEl = backLink.querySelector('.tc-back-text');
         if (textEl) textEl.textContent = 'Back to Log In';
         else backLink.textContent = 'Back to Log In';
@@ -2785,12 +2785,12 @@ var actions = document.getElementById('svSubnavActions');
           try {
             window.close();
           } catch (err) {
-            window.location.href = backLink.getAttribute('href') || 'login.html';
+            window.location.href = backLink.getAttribute('href') || '/login';
           }
           
           setTimeout(function () {
             if (!window.closed) {
-              window.location.href = backLink.getAttribute('href') || 'login.html';
+              window.location.href = backLink.getAttribute('href') || '/login';
             }
           }, 150);
         }
