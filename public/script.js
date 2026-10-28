@@ -314,7 +314,6 @@ document.addEventListener('DOMContentLoaded', () => {
         unlockError.hidden = false;
         unlockError.classList.add('is-success');
       }
-      failedAttempts = 0;
       setTimeout(() => closeOverlay(unlockModal), 1500);
     });
   }
@@ -402,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   
-  /* Login form validation and demo auth */
+  /* Login form validation (then submits to Laravel) */
   const loginForm = document.getElementById('loginForm');
   const usernameInput = document.getElementById('username');
   const usernameGroup = document.getElementById('usernameGroup');
@@ -412,15 +411,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginAlert = document.getElementById('loginAlert');
   const loginSubmitBtn = document.getElementById('loginSubmitBtn');
 
-  /* Login: juanDela2000 → UserDashboard, admin usernames → AdminDashboard */
-  const LOGIN_ACCOUNTS = {
-    juandela2000: { password: 'wZB7WYn@nnzrGw4', redirect: 'user-dashboard.html' },
-    admin: { password: 'admin12345', redirect: 'admin-dashboard.html' },
-    'admin@landbank.gov.ph': { password: 'admin12345', redirect: 'admin-dashboard.html' }
-  };
+  /* Demo Unlock ID code (becomes a real feature later) */
   const UNLOCK_OTP = '123456';
-  let failedAttempts = 0;
-  const MAX_ATTEMPTS = 3;
 
   function clearFieldErrors() {
     [usernameGroup, passwordGroup].forEach((g) => {
@@ -480,52 +472,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!password) {
         setFieldError(passwordGroup, passwordError, 'Password is required');
         hasError = true;
-      } else if (password.length < 7 || password.length > 64) {
-        setFieldError(passwordGroup, passwordError, 'Password must be 7–64 characters');
-        hasError = true;
       }
       if (hasError) return;
 
-      if (failedAttempts >= MAX_ATTEMPTS) {
-        showAlert(
-          'Your account is locked due to too many failed login attempts. Please use Unlock ID or contact LANDBANK Customer Care at (02) 8405-7000.',
-          'warning'
-        );
-        return;
-      }
-
-      const account = LOGIN_ACCOUNTS[username.toLowerCase()];
-      if (!account) {
-        failedAttempts += 1;
-        showAlert('Username does not exist. Please check your username or register.');
-        if (failedAttempts >= MAX_ATTEMPTS) {
-          showAlert(
-            'Your account is locked due to too many failed login attempts. Please use Unlock ID or contact LANDBANK Customer Care at (02) 8405-7000.',
-            'warning'
-          );
-        }
-        return;
-      }
-
-      if (password !== account.password) {
-        failedAttempts += 1;
-        setFieldError(passwordGroup, passwordError, 'The password you entered is incorrect.');
-        showAlert('The password you entered is incorrect.');
-        if (failedAttempts >= MAX_ATTEMPTS) {
-          showAlert(
-            'Your account is locked due to too many failed login attempts. Please use Unlock ID or contact LANDBANK Customer Care at (02) 8405-7000.',
-            'warning'
-          );
-        }
-        return;
-      }
-
-      failedAttempts = 0;
-      showAlert('Login successful. Redirecting to dashboard…', 'success');
+      /* Validation passed: send the form to Laravel. Laravel checks the account,
+         counts failed attempts, locks the account and redirects by role. */
       if (loginSubmitBtn) loginSubmitBtn.disabled = true;
-      setTimeout(() => {
-        window.smoothNavigate(account.redirect);
-      }, 900);
+      loginForm.submit();
     });
   }
 
