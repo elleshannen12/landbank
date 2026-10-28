@@ -2096,10 +2096,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         completedSteps.add(5);
         try { sessionStorage.setItem('pendingActivation', 'true'); } catch (e) {}
-        const successModal = document.getElementById('regSuccessModal');
-        if (successModal) {
-          successModal.classList.add('active');
-          document.body.style.overflow = 'hidden';
+                const regForm = document.getElementById('regForm');
+        if (regForm) {
+          document.getElementById('regFormName').value = val('firstName') + ' ' + val('lastName');
+          document.getElementById('regFormUsername').value = val('iaccessId');
+          document.getElementById('regFormEmail').value = val('email');
+          document.getElementById('regFormPassword').value = val('regPassword');
+          document.getElementById('regFormPasswordConfirm').value = val('regPasswordConfirm');
+          regForm.submit();
         }
         return;
       }
