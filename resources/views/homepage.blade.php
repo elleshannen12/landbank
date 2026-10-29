@@ -382,7 +382,7 @@
           <div class="sv-directory" id="svDirectory">
             <article class="sv-loc-card" data-type="branch" data-city="manila" data-lat="14.5764" data-lon="120.9880">
               <h3>LANDBANK Head Office</h3>
-              <p class="sv-loc-addr">1598 M.H. del Pilar cor. Dr. J. Quintos Sts., Malate, Manila</p>
+              <p class="sv-loc-addr">1598 M.H. del Pilar Cor. Dr. J. Quintos Sts., Malate, Manila</p>
               <span class="sv-loc-type">Branch</span>
             </article>
             <article class="sv-loc-card" data-type="branch" data-city="makati" data-lat="14.5547" data-lon="121.0244">
